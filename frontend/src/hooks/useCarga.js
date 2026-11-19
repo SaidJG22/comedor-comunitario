@@ -1,11 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { api } from '../api/client.js';
 
-/**
- * Carga datos de la API al montar y cada vez que cambia `ruta`.
- * Con `ruta = null` no consulta (útil cuando faltan parámetros).
- * Devuelve { datos, cargando, error, recargar }.
- */
+/** Carga de datos */
 export function useCarga(ruta) {
   const [estado, setEstado] = useState({ datos: null, cargando: Boolean(ruta), error: '' });
   const vigente = useRef(0);
@@ -28,7 +24,7 @@ export function useCarga(ruta) {
   useEffect(() => {
     cargar();
     return () => {
-      vigente.current += 1; // descarta respuestas de pedidos anteriores
+      vigente.current += 1; // ignora respuestas viejas
     };
   }, [cargar]);
 

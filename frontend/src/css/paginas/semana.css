@@ -1,0 +1,42 @@
+/* Semana */
+.semana-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--esp-2); margin-bottom: var(--esp-3); }
+.semana-nav .sub { grid-column: 1 / -1; margin: 0; text-align: center; font-weight: 600; }
+.semana-nav .btn { padding: .4rem; font-size: .85rem; min-height: 46px; }
+
+.dia { margin: var(--esp-4) 0; }
+.dia h2 { font-size: 1.05rem; margin: 0 0 var(--esp-2); display: flex; align-items: center; gap: .5rem; }
+.dia h2 .insignia { font-size: .7rem; }
+
+.dias-selector { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .3rem; margin-bottom: var(--esp-4); }
+.dias-selector button {
+  display: flex; flex-direction: column; align-items: center; gap: .05rem; padding: .35rem 0 .3rem; min-height: 60px;
+  background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio-s); font: inherit; font-size: .78rem;
+  cursor: pointer; color: var(--texto-suave);
+}
+.dias-selector button:hover { border-color: var(--borde-fuerte); color: var(--texto); }
+.dias-selector button strong { font-size: 1.05rem; color: var(--texto); }
+.dias-selector button.hoy { border-color: var(--acento); }
+.dias-selector button.activo { background: var(--acento); border-color: var(--acento); color: #fff; }
+.dias-selector button.activo strong { color: #fff; }
+/* Punto de menú */
+.dias-selector .punto { width: 7px; height: 7px; border-radius: 50%; background: var(--acento); display: block; }
+.dias-selector .punto.apagado { background: transparent; }
+.dias-selector button.activo .punto:not(.apagado) { background: #fff; }
+
+/* Servicio */
+.bloque {
+  background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra-1);
+  padding: var(--esp-3) var(--esp-4) var(--esp-4); display: flex; flex-direction: column; gap: var(--esp-2);
+}
+.bloque h3 { margin: 0; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--texto-suave); }
+.plato { margin: 0; font-weight: 700; font-size: 1.05rem; display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+.acciones-menu { display: flex; flex-wrap: wrap; align-items: center; gap: var(--esp-2); }
+.sin-menu { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--esp-2); }
+.sin-menu p { margin: 0; }
+
+/* Turnos */
+.turnos { display: grid; gap: .4rem; border-top: 1px solid var(--borde); padding-top: var(--esp-2); margin-top: auto; }
+.turno-linea { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+.turno-tarea { font-weight: 700; min-width: 4.5rem; }
+.asignar { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+.asignar .form-select { width: auto; min-height: 44px; padding-top: .35rem; padding-bottom: .35rem; font-size: .9rem; }

@@ -1,0 +1,16 @@
+/* Filtro */
+.filtro { display: grid; gap: .3rem; margin-bottom: var(--esp-4); min-width: 0; }
+.filtro-cabecera { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--esp-2); }
+.filtro-cabecera .form-label { margin: 0; font-weight: 600; }
+.filtro-cabecera .btn-link { display: inline-flex; align-items: center; }
+
+/* Fila deslizable */
+.filtro-opciones { display: flex; gap: var(--esp-2); overflow-x: auto; padding: 6px; margin: -6px; scrollbar-width: thin; }
+.filtro-opciones .btn { flex: none; }
+@media (min-width: 600px) { .filtro-opciones { flex-wrap: wrap; overflow: visible; } }
+
+.filtro-cantidad {
+  font-size: .75rem; font-weight: 700; line-height: 1.6; padding: 0 .45rem; border-radius: 999px;
+  background: var(--superficie-2); color: var(--texto-suave);
+}
+.btn-primary .filtro-cantidad { background: rgba(255, 255, 255, .2); color: #fff; }

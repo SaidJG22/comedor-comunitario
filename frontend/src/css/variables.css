@@ -1,0 +1,86 @@
+/* Variables */
+:root {
+  /* Azul */
+  --acento: #1e3a8a;
+  --acento-osc: #172e6e;
+  --acento-suave: #e9eef9;
+
+  /* Coral */
+  --coral: #e76f51;
+  --coral-osc: #b5462c;
+  --coral-suave: #fdefea;
+
+  /* Neutros */
+  --fondo: #f3f5f9;
+  --superficie: #ffffff;
+  --superficie-2: #f8f9fc;
+  --borde: #e0e5ee;
+  --borde-fuerte: #c5ccd8;
+  --texto: #18213a;
+  --texto-suave: #586179;
+
+  /* Estados */
+  --peligro: #b42318;
+  --peligro-osc: #8f1b13;
+  --peligro-suave: #fdeceb;
+  --aviso: #fff6dc;
+  --aviso-borde: #f0c24b;
+  --aviso-texto: #6b4a00;
+  --exito: #1a7f4b;
+  --exito-suave: #e4f4ea;
+  --foco: #b5462c;
+
+  /* Gráficos */
+  --grafico-serie-1: var(--acento);
+  --grafico-serie-2: var(--coral);
+  --grafico-serie-3: #5b7fd1;
+  --grafico-serie-4: #f4a582;
+  --grafico-serie-5: #8b95a5;
+  --grafico-serie-6: #2b4c9b;
+  --grafico-neutro: #c3cad4;
+  --grafico-grilla: #e2e5ea;
+  --grafico-ejes: #5b6475;
+  --grafico-cursor: rgba(30, 58, 138, .06);
+
+  /* Forma */
+  --radio-s: 8px;
+  --radio: 12px;
+  --radio-l: 16px;
+  --sombra-1: 0 1px 2px rgba(16, 24, 48, .05), 0 1px 3px rgba(16, 24, 48, .07);
+  --sombra-2: 0 12px 32px rgba(16, 24, 48, .18);
+
+  /* Espacios */
+  --esp-1: .25rem;
+  --esp-2: .5rem;
+  --esp-3: .75rem;
+  --esp-4: 1rem;
+  --esp-5: 1.5rem;
+  --esp-6: 2rem;
+  --margen: 1rem;
+  --ancho-max: 72rem;
+
+  /* Bootstrap */
+  --bs-primary: var(--acento);
+  --bs-primary-rgb: 30, 58, 138;
+  --bs-danger: var(--peligro);
+  --bs-danger-rgb: 180, 35, 24;
+  --bs-body-font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --bs-body-color: var(--texto);
+  --bs-body-color-rgb: 24, 33, 58;
+  --bs-body-bg: var(--superficie);
+  --bs-emphasis-color: var(--texto);
+  --bs-emphasis-color-rgb: 24, 33, 58;
+  --bs-secondary-color: var(--texto-suave);
+  --bs-border-color: var(--borde);
+  --bs-border-radius: var(--radio-s);
+  --bs-border-radius-lg: var(--radio);
+  --bs-link-color: var(--acento-osc);
+  --bs-link-color-rgb: 23, 46, 110;
+  --bs-link-hover-color: var(--acento);
+  --bs-link-hover-color-rgb: 30, 58, 138;
+  --bs-warning-bg-subtle: var(--aviso);
+  --bs-warning-border-subtle: var(--aviso-borde);
+  --bs-warning-text-emphasis: var(--aviso-texto);
+  scroll-behavior: auto;
+}
+@media (min-width: 900px) { :root { --margen: 1.5rem; } }

@@ -3,7 +3,7 @@ export const SERVICIOS = [
   { valor: 'merienda', texto: 'Merienda' },
 ];
 
-/** Botones grandes de opción única (ej.: Almuerzo / Merienda). */
+/** Selector */
 export default function Selector({ valor, onChange, opciones = SERVICIOS, etiqueta = 'Servicio' }) {
   return (
     <div className="segmentado" role="group" aria-label={etiqueta}>

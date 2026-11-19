@@ -1,8 +1,7 @@
-// Utilidades de fechas y números. Las fechas viajan como texto AAAA-MM-DD (igual que la API).
-// Se usa el mediodía local para evitar corrimientos por horario de verano o zona horaria.
+// Fechas
 const aFecha = (iso) => new Date(`${iso}T12:00:00`);
 
-export const aIso = (d) => d.toLocaleDateString('sv-SE');
+const aIso = (d) => d.toLocaleDateString('sv-SE');
 
 export const capitalizar = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 
@@ -40,3 +39,13 @@ export const fechaLegible = (iso) =>
 export const fechaCorta = (iso) => aFecha(iso).toLocaleDateString('es-AR');
 
 export const num = (n) => Number(n ?? 0).toLocaleString('es-AR', { maximumFractionDigits: 2 });
+
+/** Sin tildes */
+const normalizar = (t) => String(t ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+
+/** Coincidencia */
+export const coincide = (busqueda, ...textos) => textos.some((t) => normalizar(t).includes(normalizar(busqueda)));
+
+/** Cantidad con unidad */
+export const cantidad = (n, unidad) =>
+  `${num(n)} ${unidad === 'unidad' && Number(n) !== 1 ? 'unidades' : unidad}`;

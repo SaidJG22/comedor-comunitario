@@ -1,0 +1,24 @@
+/* Estilos de la app */
+@import './variables.css';
+@import './base.css';
+@import './layout.css';
+
+@import './componentes/botones.css';
+@import './componentes/formularios.css';
+@import './componentes/buscador.css';
+@import './componentes/filtro.css';
+@import './componentes/contenedores.css';
+@import './componentes/listas.css';
+@import './componentes/pestanas.css';
+@import './componentes/ventana.css';
+@import './componentes/avisos.css';
+@import './componentes/etiquetas.css';
+@import './componentes/tablas.css';
+@import './componentes/graficos.css';
+@import './componentes/portada.css';
+
+@import './paginas/login.css';
+@import './paginas/inicio.css';
+@import './paginas/semana.css';
+@import './paginas/raciones.css';
+@import './paginas/cuenta.css';

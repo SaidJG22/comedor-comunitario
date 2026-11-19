@@ -1,10 +1,6 @@
 import { num } from './formato.js';
 
-/**
- * Convierte un error de la API en un texto claro para la persona usuaria.
- * - 409 de stock insuficiente: nombra el producto y las cantidades.
- * - 400 de validación: agrega el detalle de los campos.
- */
+/** Mensaje de error */
 export function textoError(err, productos = []) {
   const d = err?.detalles;
   if (err?.status === 409 && d && !Array.isArray(d) && d.disponible !== undefined) {

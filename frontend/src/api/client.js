@@ -1,6 +1,6 @@
-const TOKEN_KEY = 'mesa_abierta_token';
-const USER_KEY = 'mesa_abierta_usuario';
-const AVISO_KEY = 'mesa_abierta_aviso';
+const TOKEN_KEY = 'cometuc_token';
+const USER_KEY = 'cometuc_usuario';
+const AVISO_KEY = 'cometuc_aviso';
 
 export const sesion = {
   token: () => localStorage.getItem(TOKEN_KEY),
@@ -19,12 +19,12 @@ export const sesion = {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
   },
-  // Aviso para mostrar en la pantalla de ingreso (ej.: "tu sesión venció").
+  // Aviso del ingreso
   avisar(texto) {
     try {
       sessionStorage.setItem(AVISO_KEY, texto);
     } catch {
-      /* sin almacenamiento: se omite el aviso */
+      /* sin almacenamiento */
     }
   },
   tomarAviso() {
@@ -46,7 +46,7 @@ export class ApiError extends Error {
   }
 }
 
-/** Cliente mínimo de la API REST. Cierra la sesión local ante un 401. */
+/** Cliente de la API */
 export async function api(ruta, { method = 'GET', body } = {}) {
   const headers = { 'Content-Type': 'application/json' };
   const token = sesion.token();
@@ -67,7 +67,8 @@ export async function api(ruta, { method = 'GET', body } = {}) {
   if (!res.ok) {
     if (res.status === 401 && token) {
       sesion.limpiar();
-      sesion.avisar('Tu sesión venció. Ingresá de nuevo para seguir.');
+      // Cuenta desactivada
+      sesion.avisar(data?.error?.includes('no está activa') ? data.error : 'Tu sesión venció. Ingresá de nuevo para seguir.');
       window.dispatchEvent(new Event('sesion-vencida'));
     }
     throw new ApiError(res.status, data?.error ?? 'Ocurrió un error inesperado', data?.detalles);
@@ -75,5 +76,5 @@ export async function api(ruta, { method = 'GET', body } = {}) {
   return data;
 }
 
-/** Fecha local del dispositivo en formato AAAA-MM-DD. */
+/** Fecha de hoy */
 export const hoyLocal = () => new Date().toLocaleDateString('sv-SE');

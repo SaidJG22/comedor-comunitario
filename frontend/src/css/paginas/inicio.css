@@ -1,0 +1,35 @@
+/* Inicio */
+.banner { min-height: 9.5rem; margin-bottom: var(--esp-4); }
+@media (min-width: 900px) { .banner { min-height: 12rem; } }
+
+.primeros-pasos {
+  background: var(--superficie); border: 1px solid var(--borde); border-left: 4px solid var(--coral);
+  border-radius: var(--radio); box-shadow: var(--sombra-1); padding: var(--esp-4); margin-bottom: var(--esp-4);
+}
+.primeros-pasos h2 { margin: 0; }
+.primeros-pasos ol { list-style: none; margin: .5rem 0 0; padding: 0; display: grid; gap: .3rem; }
+.primeros-pasos li { display: flex; align-items: center; gap: .6rem; min-height: 46px; }
+.primeros-pasos .tilde { flex: none; width: 26px; height: 26px; border: 2px solid var(--borde-fuerte); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; }
+.primeros-pasos li.hecho .tilde { background: var(--acento); border-color: var(--acento); }
+.primeros-pasos li.hecho a { color: var(--texto-suave); text-decoration: line-through; }
+.primeros-pasos a { color: var(--acento-osc); font-weight: 700; }
+
+/* Servicios de hoy */
+.tarjeta-hoy {
+  background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra-1);
+  padding: var(--esp-4); display: flex; flex-direction: column; gap: .25rem;
+}
+.tarjeta-hoy h3 { margin: 0 0 .2rem; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--texto-suave); }
+.tarjeta-hoy p { margin: .1rem 0; }
+.etiqueta { font-weight: 700; }
+.tarjeta-hoy .btn { margin-top: auto; width: 100%; }
+.tarjeta-hoy p:last-of-type { margin-bottom: .75rem; }
+
+/* Accesos directos */
+.tarjeta {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--esp-2);
+  background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); box-shadow: var(--sombra-1);
+  padding: 1rem 1.1rem; font-weight: 700; color: var(--texto); text-decoration: none; min-height: 56px;
+}
+.tarjeta:hover { border-color: var(--acento); color: var(--acento); }
+.tarjeta-texto { display: inline-flex; align-items: center; gap: .6rem; }

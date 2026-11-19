@@ -7,19 +7,26 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      // Las librerías de exportación (PDF/Excel) se cargan solo al exportar: no se precachean.
+      // Sin precache
       workbox: {
-        globIgnores: ['**/assets/jspdf*', '**/assets/html2canvas*', '**/assets/purify*', '**/assets/index.es-*', '**/assets/browser-*'],
+        globIgnores: [
+          '**/assets/jspdf*', '**/assets/html2canvas*', '**/assets/purify*', '**/assets/index.es-*', '**/assets/browser-*',
+          '**/assets/Graficos-*',
+        ],
       },
       manifest: {
-        name: 'Mesa Abierta – Gestión de Comedores Comunitarios',
-        short_name: 'Mesa Abierta',
+        name: 'ComeTUC – Comedor comunitario',
+        short_name: 'ComeTUC',
         lang: 'es-AR',
         start_url: '/',
         display: 'standalone',
         background_color: '#ffffff',
-        theme_color: '#1f6f50',
-        icons: [{ src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' }],
+        theme_color: '#1e3a8a',
+        // Íconos
+        icons: [
+          { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+        ],
       },
     }),
   ],

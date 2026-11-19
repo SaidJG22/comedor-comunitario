@@ -1,0 +1,17 @@
+/* Buscador */
+.buscador { display: grid; gap: .3rem; margin-bottom: var(--esp-4); }
+.buscador .form-label { margin: 0; font-weight: 600; }
+.buscador .input-group-text {
+  background: var(--superficie); color: var(--texto-suave); padding-inline: .75rem;
+  border: 1.5px solid var(--borde-fuerte); border-right: 0; border-radius: var(--radio-s) 0 0 var(--radio-s);
+  transition: border-color .15s ease-in-out, color .15s ease-in-out;
+}
+.buscador .form-control { border-left: 0; padding-left: 0; }
+/* Lupa y campo */
+.buscador .input-group:hover .input-group-text,
+.buscador .input-group:hover .form-control { border-color: #a7b0c0; }
+.buscador .input-group:focus-within .input-group-text,
+.buscador .input-group:focus-within .form-control { border-color: var(--acento); }
+.buscador .input-group:focus-within .input-group-text { color: var(--acento); }
+.buscador .input-group:focus-within { border-radius: var(--radio-s); box-shadow: 0 0 0 .25rem rgba(30, 58, 138, .2); }
+.buscador .form-control:focus { box-shadow: none; }
