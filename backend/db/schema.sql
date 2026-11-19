@@ -1,12 +1,12 @@
 
-CREATE DATABASE IF NOT EXISTS mesa_abierta
+CREATE DATABASE IF NOT EXISTS cometuc
   CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE mesa_abierta;
+USE cometuc;
 
--- ---------- Usuarios y roles ----------
+-- Usuarios y roles
 CREATE TABLE rol (
   id     TINYINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  nombre VARCHAR(30) NOT NULL UNIQUE      -- Administrador | Responsable | Voluntario
+  nombre VARCHAR(30) NOT NULL UNIQUE
 ) ENGINE=InnoDB;
 
 CREATE TABLE usuario (
@@ -20,10 +20,10 @@ CREATE TABLE usuario (
   CONSTRAINT fk_usuario_rol FOREIGN KEY (rol_id) REFERENCES rol (id)
 ) ENGINE=InnoDB;
 
--- ---------- Stock ----------
+-- Stock
 CREATE TABLE categoria (
   id     SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  nombre VARCHAR(50) NOT NULL UNIQUE      -- ej.: Secos, Frescos, Lácteos, Limpieza
+  nombre VARCHAR(50) NOT NULL UNIQUE
 ) ENGINE=InnoDB;
 
 CREATE TABLE producto (
@@ -64,17 +64,16 @@ CREATE TABLE movimiento_stock (
   CONSTRAINT fk_mov_usuario  FOREIGN KEY (usuario_id)  REFERENCES usuario (id)
 ) ENGINE=InnoDB;
 
--- ---------- Donaciones ----------
+-- Donaciones
 CREATE TABLE origen_donacion (
   id     TINYINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  nombre VARCHAR(40) NOT NULL UNIQUE      -- Estado | Banco de Alimentos | Particular | Comercio
+  nombre VARCHAR(40) NOT NULL UNIQUE
 ) ENGINE=InnoDB;
 
 CREATE TABLE donacion (
   id          INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   origen_id   TINYINT UNSIGNED NOT NULL,
-  -- Referencia opcional y genérica 
-  -- personales de donantes particulares.
+  -- Sin datos personales
   referencia  VARCHAR(100) NULL,
   fecha       DATE NOT NULL,
   usuario_id  INT UNSIGNED NOT NULL,
@@ -96,7 +95,7 @@ CREATE TABLE donacion_item (
   CONSTRAINT fk_ditem_lote     FOREIGN KEY (lote_id)     REFERENCES lote_stock (id)
 ) ENGINE=InnoDB;
 
--- ---------- Menús ----------
+-- Menús
 CREATE TABLE menu (
   id                    INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   fecha                 DATE NOT NULL,
@@ -116,7 +115,7 @@ CREATE TABLE menu_insumo (
   CONSTRAINT fk_minsumo_producto FOREIGN KEY (producto_id) REFERENCES producto (id)
 ) ENGINE=InnoDB;
 
--- ---------- Raciones servidas (SOLO cantidades) ----------
+-- Raciones
 CREATE TABLE racion_diaria (
   id          INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   fecha       DATE NOT NULL,
@@ -128,19 +127,11 @@ CREATE TABLE racion_diaria (
   CONSTRAINT fk_racion_usuario FOREIGN KEY (usuario_id) REFERENCES usuario (id)
 ) ENGINE=InnoDB;
 
--- ---------- Voluntarios y turnos ----------
+-- Voluntarios y turnos
 CREATE TABLE voluntario (
   id             INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  nombre_visible VARCHAR(80) NOT NULL,     -- nombre o apodo; sin datos sensibles
+  nombre_visible VARCHAR(80) NOT NULL,     -- nombre o apodo
   activo         BOOLEAN NOT NULL DEFAULT TRUE
-) ENGINE=InnoDB;
-
--- Roles que puede cumplir una persona dentro de un turno (catálogo editable desde la aplicación).
-CREATE TABLE funcion_turno (
-  id     SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  nombre VARCHAR(40) NOT NULL UNIQUE,
-  tarea  ENUM('cocina','servicio') NOT NULL,   -- en qué grupo aparece al asignar
-  activo BOOLEAN NOT NULL DEFAULT TRUE
 ) ENGINE=InnoDB;
 
 CREATE TABLE turno (
@@ -148,9 +139,7 @@ CREATE TABLE turno (
   fecha         DATE NOT NULL,
   servicio      ENUM('almuerzo','merienda') NOT NULL,
   tarea         ENUM('cocina','servicio') NOT NULL,
-  funcion_id    SMALLINT UNSIGNED NULL,        -- rol en el turno; NULL = sin rol específico
   voluntario_id INT UNSIGNED NOT NULL,
   UNIQUE KEY uq_turno (fecha, servicio, tarea, voluntario_id),
-  CONSTRAINT fk_turno_voluntario FOREIGN KEY (voluntario_id) REFERENCES voluntario (id),
-  CONSTRAINT fk_turno_funcion    FOREIGN KEY (funcion_id)    REFERENCES funcion_turno (id)
+  CONSTRAINT fk_turno_voluntario FOREIGN KEY (voluntario_id) REFERENCES voluntario (id)
 ) ENGINE=InnoDB;
