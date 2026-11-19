@@ -1,10 +1,6 @@
 import mysql from 'mysql2/promise';
 
-/**
- * Envuelve el pool de MySQL en una interfaz mínima { query, transaction, close }.
- * Los servicios dependen de esta interfaz (no de mysql2), lo que permite probarlos
- * con una base simulada.
- */
+/** Pool de MySQL */
 export function createDb(dbConfig) {
   const pool = mysql.createPool({
     ...dbConfig,

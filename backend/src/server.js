@@ -7,7 +7,7 @@ const db = createDb(env.db);
 const app = createApp({ db, env });
 
 const server = app.listen(env.port, () => {
-  console.log(`API Mesa Abierta escuchando en http://localhost:${env.port}`);
+  console.log(`API ComeTUC escuchando en http://localhost:${env.port}`);
 });
 
 const cerrar = () => server.close(() => db.close().finally(() => process.exit(0)));

@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 const SECRETO_POR_DEFECTO = 'solo-desarrollo-cambiar';
 
-/** Lee y valida la configuración. En producción exige un JWT_SECRET propio y largo. */
+/** Configuración */
 export function loadEnv(source = process.env) {
   const env = {
     produccion: source.NODE_ENV === 'production',
@@ -15,7 +15,7 @@ export function loadEnv(source = process.env) {
       port: Number(source.DB_PORT ?? 3306),
       user: source.DB_USER ?? 'root',
       password: source.DB_PASSWORD ?? '',
-      database: source.DB_NAME ?? 'mesa_abierta',
+      database: source.DB_NAME ?? 'cometuc',
     },
   };
 

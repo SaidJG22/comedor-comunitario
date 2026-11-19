@@ -1,7 +1,7 @@
 {
-  "name": "mesa-abierta-backend",
+  "name": "cometuc-backend",
   "version": "0.1.0",
-  "description": "API REST del Sistema de Gestión para Comedores Comunitarios (Mesa Abierta)",
+  "description": "API REST de ComeTUC, sistema de gestión del comedor comunitario",
   "type": "module",
   "private": true,
   "main": "src/server.js",
@@ -9,7 +9,8 @@
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "db:check": "node scripts/db-check.js",
-    "seed:admin": "node scripts/seed-admin.js"
+    "seed:admin": "node scripts/seed-admin.js",
+    "seed:usuarios": "node scripts/seed-usuarios.js"
   },
   "engines": {
     "node": ">=20"

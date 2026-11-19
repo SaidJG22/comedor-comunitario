@@ -1,12 +1,11 @@
-// Uso: npm run db:check
-// Diagnostica la conexión con MySQL usando backend/.env. Nunca imprime la contraseña.
+// Diagnóstico de la base
 import { existsSync } from 'node:fs';
 import { loadEnv } from '../src/config/env.js';
 import { createDb } from '../src/db/pool.js';
 
 const TABLAS_ESPERADAS = [
   'rol', 'usuario', 'categoria', 'producto', 'lote_stock', 'movimiento_stock', 'origen_donacion',
-  'donacion', 'donacion_item', 'menu', 'menu_insumo', 'racion_diaria', 'voluntario', 'funcion_turno', 'turno',
+  'donacion', 'donacion_item', 'menu', 'menu_insumo', 'racion_diaria', 'voluntario', 'turno',
 ];
 
 const AYUDA = {
@@ -38,11 +37,8 @@ try {
 
   const tablas = (await db.query('SELECT table_name AS t FROM information_schema.tables WHERE table_schema = DATABASE()')).map((r) => r.t.toLowerCase());
   const faltan = TABLAS_ESPERADAS.filter((t) => !tablas.includes(t));
-  // funcion_turno se agrega con la migración 001 (más abajo); el resto viene de schema.sql.
-  const faltanBase = faltan.filter((t) => t !== 'funcion_turno');
-  if (faltanBase.length) mal(`Faltan tablas: ${faltanBase.join(', ')}. Ejecutá backend/db/schema.sql.`);
-  else if (faltan.length === 0) ok(`Las ${TABLAS_ESPERADAS.length} tablas existen`);
-  else ok(`Las ${TABLAS_ESPERADAS.length - 1} tablas base existen`);
+  if (faltan.length) mal(`Faltan tablas: ${faltan.join(', ')}. Ejecutá backend/db/schema.sql.`);
+  else ok(`Las ${TABLAS_ESPERADAS.length} tablas existen`);
 
   if (!faltan.includes('rol')) {
     const roles = (await db.query('SELECT nombre FROM rol ORDER BY id')).map((r) => r.nombre);
@@ -54,21 +50,10 @@ try {
     if (n > 0) ok(`Administradores activos: ${n}`);
     else console.log('• Todavía no hay administrador: creálo con "npm run seed:admin".');
   }
-  // Roles dentro de cada turno (migración 001)
-  if (faltan.includes('funcion_turno')) {
-    mal('Falta la tabla funcion_turno (roles de turno). Ejecutá backend/db/migraciones/001-roles-de-turno.sql en MySQL Workbench.');
-  } else {
-    const [{ n: col }] = await db.query(
-      "SELECT COUNT(*) AS n FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'turno' AND column_name = 'funcion_id'",
-    );
-    const [{ n: roles }] = await db.query('SELECT COUNT(*) AS n FROM funcion_turno WHERE activo = TRUE');
-    if (col === 0) mal('La tabla turno no tiene la columna funcion_id. Ejecutá backend/db/migraciones/001-roles-de-turno.sql.');
-    else ok(`Roles de turno: columna turno.funcion_id presente y ${roles} roles cargados`);
-  }
   const [{ n: personas }] = await db.query(
     "SELECT COUNT(*) AS n FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name REGEXP 'benefici|persona|asistente'",
   );
-  if (personas === 0) ok('No hay tablas de personas asistidas (el sistema no es un CRM)');
+  if (personas === 0) ok('No hay tablas de personas asistidas');
   else mal('Hay tablas que parecen guardar personas asistidas: revisar el modelo.');
 } catch (err) {
   mal(AYUDA[err.code] ?? `${err.code ?? 'Error'}: ${err.message}`);

@@ -39,11 +39,11 @@ export function errorHandler(err, _req, res, _next) {
   if (err?.type === 'entity.parse.failed') {
     return res.status(400).json({ error: 'JSON inválido' });
   }
-  // Clave foránea inexistente (ej.: producto u origen que no existe)
+  // Clave foránea inexistente
   if (err?.code === 'ER_NO_REFERENCED_ROW_2') {
     return res.status(400).json({ error: 'Hace referencia a un registro que no existe' });
   }
-  // Base de datos inaccesible: se informa sin exponer detalles internos (el detalle va al registro del servidor).
+  // Base inaccesible
   if (CODIGOS_BASE_NO_DISPONIBLE.has(err?.code)) {
     console.error(`Base de datos no disponible (${err.code}): ${err.message}`);
     return res.status(503).json({ error: 'El servicio de base de datos no está disponible. Intentá de nuevo en unos minutos.' });

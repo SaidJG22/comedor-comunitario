@@ -1,4 +1,4 @@
-// Uso: ADMIN_EMAIL=... ADMIN_PASSWORD=... ADMIN_NOMBRE=... npm run seed:admin
+// Crear administrador
 import bcrypt from 'bcryptjs';
 import { loadEnv } from '../src/config/env.js';
 import { createDb } from '../src/db/pool.js';

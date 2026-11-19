@@ -13,12 +13,10 @@ import { voluntariosRoutes } from './modules/voluntarios/voluntarios.routes.js';
 import { reportesRoutes } from './modules/reportes/reportes.routes.js';
 import { usuariosRoutes } from './modules/usuarios/usuarios.routes.js';
 
-/**
- * Crea la aplicación Express. `db` y `env` se inyectan para poder probar sin MySQL real.
- */
+/** Aplicación Express */
 export function createApp({ db, env }) {
   const app = express();
-  const auth = makeAuth(env.jwtSecret);
+  const auth = makeAuth(env.jwtSecret, db);
   const deps = { db, auth };
 
   app.disable('x-powered-by');
@@ -26,14 +24,14 @@ export function createApp({ db, env }) {
   app.use(cors({ origin: env.corsOrigin }));
   app.use(express.json({ limit: '100kb' }));
 
-  app.get('/api/health', (_req, res) => res.json({ status: 'ok', servicio: 'mesa-abierta-api' }));
-  // Comprueba además la conexión con la base de datos (503 si no responde).
+  app.get('/api/health', (_req, res) => res.json({ status: 'ok', servicio: 'cometuc-api' }));
+  // Estado de la base
   app.get('/api/health/db', async (_req, res) => {
     await db.query('SELECT 1');
     res.json({ status: 'ok', baseDeDatos: 'conectada' });
   });
 
-  // Freno a la adivinación de contraseñas: máximo de intentos de inicio de sesión por IP.
+  // Límite de ingreso
   app.use(
     '/api/auth/login',
     rateLimit({
@@ -42,6 +40,16 @@ export function createApp({ db, env }) {
       standardHeaders: true,
       legacyHeaders: false,
       message: { error: 'Demasiados intentos de ingreso. Esperá unos minutos y probá de nuevo.' },
+    }),
+  );
+  app.use(
+    '/api/auth/registro',
+    rateLimit({
+      windowMs: 15 * 60 * 1000,
+      limit: env.registroLimit ?? 10,
+      standardHeaders: true,
+      legacyHeaders: false,
+      message: { error: 'Demasiados registros desde esta conexión. Esperá unos minutos y probá de nuevo.' },
     }),
   );
   app.use(
