@@ -1,7 +1,6 @@
 // Crear administrador
-import bcrypt from 'bcryptjs';
-import { loadEnv } from '../src/config/env.js';
-import { createDb } from '../src/db/pool.js';
+const bcrypt = require('bcryptjs');
+const { conection } = require('../config/db.js');
 
 const { ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_NOMBRE = 'Administrador' } = process.env;
 if (!ADMIN_EMAIL || !ADMIN_PASSWORD || ADMIN_PASSWORD.length < 8) {
@@ -9,15 +8,21 @@ if (!ADMIN_EMAIL || !ADMIN_PASSWORD || ADMIN_PASSWORD.length < 8) {
   process.exit(1);
 }
 
-const db = createDb(loadEnv().db);
-try {
-  const hash = await bcrypt.hash(ADMIN_PASSWORD, 10);
-  await db.query(
-    `INSERT INTO usuario (nombre, email, password_hash, rol_id)
-     SELECT ?, ?, ?, id FROM rol WHERE nombre = 'Administrador'`,
-    [ADMIN_NOMBRE, ADMIN_EMAIL.toLowerCase(), hash],
-  );
-  console.log(`Administrador creado: ${ADMIN_EMAIL}`);
-} finally {
-  await db.close();
-}
+const crearAdmin = async () => {
+  try {
+    const hash = await bcrypt.hash(ADMIN_PASSWORD, 10);
+    await conection.query(
+      `INSERT INTO usuario (nombre, email, password_hash, rol_id)
+       SELECT ?, ?, ?, id FROM rol WHERE nombre = 'Administrador'`,
+      [ADMIN_NOMBRE, ADMIN_EMAIL.toLowerCase(), hash],
+    );
+    console.log(`Administrador creado: ${ADMIN_EMAIL}`);
+  } catch (error) {
+    console.error(error.code === 'ER_DUP_ENTRY' ? 'Ya existe un usuario con ese correo.' : error.message);
+    process.exitCode = 1;
+  } finally {
+    await conection.end();
+  }
+};
+
+crearAdmin();

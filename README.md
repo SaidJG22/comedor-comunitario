@@ -10,7 +10,7 @@ Un comedor comunitario funciona con lo que va llegando: compras, mercadería del
 
 ComeTUC junta todo eso en una aplicación web que se usa desde la computadora o desde el celular. Cada producto se carga una sola vez, con su categoría y un stock mínimo. Lo que llega, sea por compra o por donación, entra como un lote con su fecha de vencimiento, y lo que se usa se descuenta. Cuando algo queda por debajo del mínimo o está por vencer, el sistema lo avisa.
 
-La semana se arma día por día, con almuerzo y merienda: el plato, para cuántas raciones y qué insumos lleva. Al confirmar un menú, esos insumos se descuentan solos de la despensa. En cada servicio se anotan los voluntarios de cocina y de servicio, y después cuántas raciones se sirvieron. Con esos datos salen los informes: gráficos del período y tablas que se pueden bajar en PDF o en Excel.
+La semana se arma día por día, con almuerzo y merienda: el plato, para cuántas raciones y qué insumos lleva. Al confirmar un menú, esos insumos se descuentan solos de la despensa. En cada servicio se anotan los voluntarios de cocina y de servicio, y después cuántas raciones se sirvieron. Con esos datos salen los informes: los números y el gráfico del mes en el inicio, y gráficos y tablas con los totales de cada período.
 
 Hay tres roles:
 
@@ -30,7 +30,7 @@ Estas son las decisiones principales que tomamos:
 - Un menú confirmado ya no se edita ni se borra, porque sus insumos ya salieron de la despensa.
 - Las cuentas creadas desde el registro quedan pendientes. Es un comedor y no queríamos que cualquiera con el enlace pudiera entrar a cargar datos.
 - Lo que ya tiene historia no se borra: un producto con movimientos, un voluntario que tuvo turnos o un usuario que cargó datos se dan de baja, así no se pierde lo registrado. Lo que se cargó por error y todavía no se usó, sí se puede borrar. En los dos casos se pide confirmación.
-- Está pensado para usarse desde el celular, con botones grandes y todo en una columna en pantallas chicas. También se puede instalar como aplicación.
+- Está pensado para usarse desde el celular, con botones grandes y todo en una columna en pantallas chicas.
 - Los permisos no dependen de esconder botones. El servidor revisa el token y el rol en cada pedido, y si se desactiva una cuenta deja de funcionar en ese momento.
 
 ## Integrantes
@@ -45,16 +45,15 @@ Estas son las decisiones principales que tomamos:
 
 - **Frontend:**
   - React 19 con Vite y react-router-dom para la navegación;
-  - Zustand para la sesión;
-  - Bootstrap 5.3 para los estilos, adaptado a los colores del comedor;
-  - Recharts para los gráficos;
-  - jsPDF y write-excel-file para las descargas.
+  - Zustand para la sesión y axios para hablar con la API;
+  - Bootstrap 5.3 con react-bootstrap y react-icons, adaptado a los colores del comedor y con modo oscuro;
+  - Recharts para los gráficos.
 - **Backend:**
-  - Node.js con Express 5;
+  - Node.js con Express 5 (CommonJS) y nodemon para desarrollar;
   - mysql2, con consultas parametrizadas;
   - zod para validar los datos;
   - bcryptjs para las contraseñas y JWT para las sesiones;
-  - además, helmet, cors y un límite de intentos en el ingreso y en el registro.
+  - cors, para que el frontend pueda llamar a la API.
 - **Base de datos:** MySQL 8, con 14 tablas relacionadas. El diagrama está en [docs/der.md](docs/der.md).
 
 ## Requisitos
@@ -137,16 +136,23 @@ comedor-comunitario/
 ├── backend/            API REST con Express
 │   ├── db/             schema.sql, seed.sql, crear-usuario.sql, datos-iniciales.sql
 │   ├── scripts/        db-check, seed-admin, seed-usuarios
-│   └── src/            app.js, server.js, config/, db/, middleware/ (sesión, errores, validación)
-│       └── modules/    auth, stock, donaciones, menus, raciones, voluntarios, reportes, usuarios
-│                       (cada uno con sus rutas, su controlador y su modelo)
+│   ├── index.js        arranque de Express y montaje de las rutas
+│   ├── config/         conexión a MySQL
+│   ├── routes/         rutas por recurso (auth, stock, donaciones, menus, raciones, voluntarios, reportes, usuarios)
+│   ├── controllers/    reciben el pedido y responden
+│   ├── models/         consultas SQL y transacciones
+│   ├── middlewares/    token, roles, validación y errores
+│   └── schemas/        validaciones con zod
 ├── frontend/           React + Vite
 │   ├── public/         íconos, logo y fotos
 │   └── src/
-│       ├── pages/      una carpeta por pantalla: login, registro, inicio, raciones, despensa, semana, informes, usuarios, cuenta
-│       ├── components/ piezas que se reutilizan (campos, ventanas, avisos, gráficos…)
+│       ├── pages/      public/ (ingreso, registro), users/ (todos los roles), admin/ (gestión)
+│       ├── router/     UsersRoute, GestionRoute y AdminRoute
+│       ├── store/      useAuthStore (Zustand)
+│       ├── services/   Api.js (dirección de la API)
+│       ├── components/ NavBar, Footer, Layout, Encabezado, BotonTema y Graficos
 │       ├── css/        todos los estilos
-│       └── …           api/, auth/, store/ (Zustand), hooks/, layout/, utils/
+│       └── utils/      fechas, cantidades y errores
 └── docs/               diagrama entidad-relación
 ```
 

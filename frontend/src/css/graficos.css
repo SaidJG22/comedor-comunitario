@@ -1,0 +1,8 @@
+/* Gráficos */
+.grafico-lienzo { width: 100%; height: 16rem; }
+.grafico-vacio { height: 16rem; display: grid; place-items: center; margin: 0; color: var(--texto-suave); background: var(--superficie-2); border-radius: var(--radio-s); }
+.grafico .recharts-cartesian-axis-tick text, .grafico .recharts-pie-label-text { fill: var(--texto-suave); font-size: .75rem; }
+.grafico .recharts-cartesian-grid line { stroke: var(--borde); }
+.grafico .recharts-legend-item-text { color: var(--texto) !important; font-size: .8rem; }
+.grafico .recharts-default-tooltip { background: var(--superficie) !important; border-color: var(--borde) !important; color: var(--texto); }
+.grafico .recharts-tooltip-cursor { fill: var(--acento-suave); }

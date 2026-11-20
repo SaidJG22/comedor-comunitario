@@ -1,8 +1,0 @@
-/* Tablas */
-.tabla-scroll { overflow-x: auto; margin: var(--esp-2) 0 var(--esp-4); border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie); }
-.tabla { margin-bottom: 0; vertical-align: middle; font-size: .9rem; }
-.tabla th, .tabla td { padding: .65rem .8rem; text-align: left; border-bottom: 1px solid var(--borde); }
-.tabla thead th { background: var(--superficie-2); color: var(--texto-suave); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
-.tabla tbody tr:last-child td { border-bottom: 0; }
-.tabla tfoot th, .tabla tfoot td { font-weight: 700; border-top: 1px solid var(--borde-fuerte); border-bottom: 0; }
-.tabla .num { text-align: right; font-variant-numeric: tabular-nums; }

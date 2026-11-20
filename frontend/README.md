@@ -1,104 +1,91 @@
 # Frontend – ComeTUC
 
-Interfaz web responsive (PWA) en React + Vite, pensada para usarse desde el celular por personas con poca experiencia.
+Interfaz web en React + Vite, armada con lo que se vio en clase: react-router-dom, Zustand, axios, Bootstrap (react-bootstrap), react-icons y Recharts para los gráficos. Tiene botón de modo oscuro.
 
-**Públicas:** `/login` (ingresar) y `/registro` (crear una cuenta, que queda pendiente hasta que el Administrador la active). Comparten la pantalla con la foto (`layout/IngresoLayout.jsx`).
+## Pantallas
+**Públicas:** `/login` y `/registro` (la cuenta nueva queda pendiente hasta que el Administrador la active).
 
-Navegación fija arriba, con íconos y texto:
-- **Inicio**: foto de portada, números del mes y gráfico de raciones (Administrador y Responsable), resumen del día (menú, quién cocina, raciones) y primeros pasos guiados.
-- **Raciones**: cantidad de raciones servidas por día y servicio (se puede cargar un día anterior). Gestión puede borrar un registro cargado por error.
-- **Despensa** (Administrador y Responsable): productos (alta, edición y baja, con buscador y filtro por categoría), movimientos, alertas y donaciones (con su detalle). El Administrador además agrega, edita y borra categorías ("Editar categorías").
-- **Semana**: pestaña **Menús** (menús y turnos día por día, con detalle de cada menú) y pestaña **Equipo** (voluntarios). El Voluntario ve los menús en solo lectura.
-- **Informes** (Administrador y Responsable): gráficos del período (Recharts) y tablas de raciones, insumos y donaciones con descarga a PDF y Excel.
-- **Mi cuenta**: cambiar la contraseña; el Administrador accede desde ahí a **Usuarios y roles**.
+**Privadas** (según el rol):
+- **Inicio** (`/`): resumen del día (menú, quién cocina, raciones). Administrador y Responsable ven además los números del mes y el gráfico de raciones.
+- **Raciones** (`/raciones`): cantidad servida por día y servicio.
+- **Semana** (`/semana`): menús y turnos día por día; detalle del menú en `/semana/menus/:id`.
+- **Despensa** (Administrador y Responsable): productos con buscador, filtro por categoría y alertas; movimientos de stock; donaciones con su detalle. Las categorías, solo el Administrador.
+- **Voluntarios** e **Informes** (Administrador y Responsable). Informes tiene cuatro gráficos (Recharts) y tablas con los totales del período.
+- **Mi cuenta** (`/cuenta`) y **Usuarios y roles** (solo Administrador).
 
-Cada alta y edición es una pantalla con su propia dirección (`useParams` + `useNavigate`); lo que borra o da de baja pide confirmación:
+| Entidad | Listado | Alta | Edición |
+|---|---|---|---|
+| Producto | `/productos` | `/productos/nuevo` | `/productos/:id/editar` |
+| Categoría | `/categorias` | `/categorias/nueva` | `/categorias/:id/editar` |
+| Donación | `/donaciones` | `/donaciones/nueva` | `/donaciones/:id/editar` |
+| Menú | `/semana` | `/semana/menus/nuevo` | `/semana/menus/:id/editar` |
+| Voluntario | `/voluntarios` | `/voluntarios/nuevo` | `/voluntarios/:id/editar` |
+| Usuario | `/usuarios` | `/usuarios/nuevo` | `/usuarios/:id/editar` |
 
-| Entidad | Listado | Crear | Editar | Detalle |
-|---|---|---|---|---|
-| Producto | `/despensa/existencias` | `/despensa/existencias/nuevo` | `/despensa/existencias/:id/editar` | — |
-| Categoría (solo Administrador) | `/despensa/categorias` | `/despensa/categorias/nueva` | `/despensa/categorias/:id/editar` | — |
-| Donación | `/despensa/donaciones` | `/despensa/donaciones/nueva` | `/despensa/donaciones/:id/editar` | `/despensa/donaciones/:id` |
-| Menú | `/semana` | `/semana/menus/nuevo` | `/semana/menus/:id/editar` | `/semana/menus/:id` |
-| Voluntario | `/semana/equipo` | `/semana/equipo/nuevo` | `/semana/equipo/:id/editar` | — |
-| Usuario | `/usuarios` | `/usuarios/nuevo` | `/usuarios/:id/editar` | — |
-
-La sesión (usuario, ingreso y salida) vive en un store de **Zustand**: `src/store/sesion.js`.
-
-Cada pantalla trae una ayuda plegable "¿Cómo se usa?".
+El borrado se hace desde cada listado y pide confirmación con `window.confirm`.
 
 ## Organización del código
 ```
 src/
-├── main.jsx · App.jsx    arranque y rutas
-├── pages/                una carpeta por sección
-│   ├── login/            LoginPage
-│   ├── registro/         RegistroPage
-│   ├── inicio/           InicioPage
-│   ├── raciones/         RacionesPage
-│   ├── despensa/         DespensaLayout, ExistenciasPage, ProductoFormPage, CategoriasPage, CategoriaFormPage,
-│   │                     DonacionesPage, DonacionFormPage, DonacionDetallePage
-│   ├── semana/           SemanaLayout, SemanaPage, MenuFormPage, MenuDetallePage, VoluntariosPage, VoluntarioFormPage
-│   ├── informes/         InformesPage
-│   ├── usuarios/         UsuariosPage, UsuarioFormPage, ContrasenaPage
-│   └── cuenta/           CuentaPage
-├── components/           piezas reutilizables (campos, ventana, confirmación, avisos, gráficos…)
-├── layout/               AppShell: cabecera y contenido
-├── css/                  todos los estilos (ver abajo)
-├── api/ · auth/ · store/ · hooks/ · utils/
+├── main.jsx               importa Bootstrap y css/index.css, y monta App
+├── App.jsx                BrowserRouter + Routes
+├── router/                UsersRoute, GestionRoute y AdminRoute (Outlet o Navigate según user.rol)
+├── store/useAuthStore.js  Zustand: user (con su token) y tema, en localStorage; login, logout y cambiarTema
+├── services/Api.js        BASE_URL de la API y el encabezado con el token
+├── components/            NavBar, Footer, Layout, Encabezado, BotonTema y Graficos (Recharts)
+├── pages/
+│   ├── public/            Login, Registro, NotFound, Unauthorized
+│   ├── users/             Home, Raciones, Semana, MenuDetalle, Cuenta
+│   └── admin/             Productos, ProductoForm, Movimiento, Categorias, CategoriaForm,
+│                          Donaciones, DonacionForm, DonacionDetalle, MenuForm, Voluntarios,
+│                          VoluntarioForm, Usuarios, UsuarioForm, Contrasena, Informes
+├── utils/                 fechas, cantidades y texto de los errores
+└── css/                   estilos
+```
+
+Cada pantalla trae sus datos así:
+```js
+const getProductos = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/stock/productos`, conToken(user))
+    setProductos(response.data)
+  } catch (err) {
+    setError(mensajeError(err))
+  } finally {
+    setLoading(false)
+  }
+}
+
+useEffect(() => {
+  getProductos()
+}, [])
 ```
 
 ## Estilos (`src/css/`)
-**Bootstrap 5.3** (solo el CSS) se importa primero en `src/main.jsx`, y después `css/index.css`, que carga el resto en orden.
-**Ningún `.jsx` ni `.js` tiene estilos escritos**: todo el CSS está en esta carpeta.
+Bootstrap se importa en `main.jsx` y después `css/index.css`. Ningún `.jsx` tiene estilos escritos: se usan clases de Bootstrap o estos archivos.
 
 | Archivo | Qué tiene |
 |---|---|
-| `variables.css` | Colores, espacios y bordes, más las variables de Bootstrap (`--bs-*`) y la paleta de los gráficos (`--grafico-*`). |
-| `base.css` | Página, títulos, textos de ayuda, foco con teclado y animaciones. |
-| `layout.css` | Cabecera (marca, secciones y cuenta) y contenido. |
-| `componentes/` | Botones, formularios, contenedores, listas, pestañas, ventana, avisos, etiquetas, tablas, gráficos y portada. |
-| `paginas/` | Lo propio de una pantalla: login, inicio, semana, raciones y cuenta. |
+| `variables.css` | Colores del comedor, variables de Bootstrap (`--bs-*`) y los colores del modo oscuro. |
+| `tema.css` | Botones con los colores del comedor. |
+| `base.css` | Fondo, barra, formularios y contador de raciones. |
+| `ingreso.css` | Pantallas de ingreso y registro. |
+| `graficos.css` | Tarjetas y ejes de los gráficos. |
+| `semana.css` | Días de la semana y turnos. |
+| `colorido.css` | Modo claro con los colores del logo: franjas de color, tarjetas con borde de color, tablas y botones. Solo se aplica en modo claro. |
 
-- **Colores:** salen de `variables.css`. Los gráficos de Recharts y el PDF los leen con `utils/css.js` (`colorCss('--acento')`), así hay un solo lugar para cambiarlos.
-- **Clases de Bootstrap que se usan:**
-  - la grilla (`row g-3` + `col-*`);
-  - los botones (`btn btn-primary`, `btn-outline-secondary`, `btn-danger`, `btn-sm`);
-  - los campos (`form-control`, `form-select`, `form-label`, `form-text`);
-  - las tablas (`table table-hover`);
-  - las etiquetas (`badge rounded-pill`);
-  - los avisos (`alert alert-warning`).
-- **La ventana propia** se llama `.ventana` (no `.modal`), para no chocar con la de Bootstrap.
+## Modo oscuro
+El botón con la luna (en la barra y en el ingreso) cambia `tema` en el store. `App.jsx` lo aplica con `document.documentElement.setAttribute('data-bs-theme', tema)`, que es el modo oscuro que trae Bootstrap 5.3, y queda guardado en `localStorage`.
 
 ## Logo y fotos
-El sistema lleva el nombre del comedor, **ComeTUC**, y usa su logo.
-El original (`logo.jpg`, 1,8 MB) no va en el repositorio: se guarda aparte, en la carpeta de la presentación (`originales/`). De ahí salen versiones livianas, que son las que usa la app:
-
-| Archivo | Dónde aparece |
-|---|---|
-| `imagenes/logo-simbolo.jpg` y `imagenes/logo-nombre.jpg` | Barra de arriba (dibujo + nombre) |
-| `imagenes/logo-completo.jpg` | Pantalla de ingreso, arriba del formulario |
-| `icon-192.png` y `icon-512.png` | Ícono de la pestaña y de la app instalada en el celular |
-
-Si cambia el logo, hay que volver a generar esas versiones (no conviene publicar el original de 1,8 MB).
-
-Las fotos del comedor se ponen en `public/imagenes/` con estos nombres exactos:
-
-| Archivo | Dónde aparece | Tamaño sugerido |
-|---|---|---|
-| `portada.jpg` | Pantalla de ingreso (mitad izquierda en la computadora, arriba en el celular) | 1200 × 1400 px, vertical |
-| `inicio.jpg` | Banner de arriba de Inicio | 1600 × 500 px, horizontal |
-
-Mientras no estén, se ve un fondo de color con el aviso "Espacio para una foto". Para cambiar una foto
-alcanza con reemplazar el archivo (no pasa por la base de datos). Conviene que pesen menos de 300 KB.
-No uses fotos donde se pueda reconocer a las personas que asisten al comedor.
+`public/imagenes/` tiene `logo-simbolo.jpg` y `logo-nombre.jpg` (barra), `logo-completo.jpg` y `portada.jpg` (ingreso) e `inicio.jpg` (foto del banner de Inicio). El logo original no va en el repositorio. No uses fotos donde se pueda reconocer a las personas que asisten al comedor.
 
 ## Requisitos
-Node.js 20 o más nuevo y la API del `backend/` en marcha (puerto 3000).
+Node.js 20 o más nuevo y la API del `backend/` en marcha en `http://localhost:3000`.
 
 ## Uso
 ```
 npm install
-npm run dev        # http://localhost:5173  (las llamadas a /api se redirigen al backend)
+npm run dev        # http://localhost:5173
 npm run build      # versión de producción en dist/
 ```

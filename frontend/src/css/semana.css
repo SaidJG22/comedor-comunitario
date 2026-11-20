@@ -1,0 +1,6 @@
+/* Días */
+.dias { display: grid; grid-template-columns: repeat(7, 1fr); gap: .35rem; }
+.dias .btn { padding: .4rem .2rem; font-size: .85rem; }
+
+/* Turnos */
+.turno { display: inline-block; border: 1px solid var(--borde); border-radius: 999px; padding: 0 .6rem; margin: 0 .25rem .25rem 0; background: var(--superficie-2); }

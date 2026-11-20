@@ -1,14 +1,14 @@
-import { num } from './formato.js';
-
-/** Mensaje de error */
-export function textoError(err, productos = []) {
-  const d = err?.detalles;
-  if (err?.status === 409 && d && !Array.isArray(d) && d.disponible !== undefined) {
-    const nombre = productos.find((p) => p.id === d.productoId)?.nombre ?? 'un producto';
-    return `No alcanza el stock de ${nombre}: hay ${num(d.disponible)} y se necesitan ${num(d.solicitado)}.`;
+// Texto del error
+export const mensajeError = (err) => {
+  if (!err.response) {
+    return 'No hay conexión con el servidor.'
   }
-  if (Array.isArray(d) && d.length > 0) {
-    return `${err.message}: ${d.map((x) => x.mensaje).join('; ')}`;
+  const datos = err.response.data
+  if (datos.errors) {
+    return datos.errors.map((e) => e.message).join('. ')
   }
-  return err?.message ?? 'Ocurrió un error inesperado';
+  if (datos.detalles && datos.detalles.disponible !== undefined) {
+    return `No alcanza el stock: hay ${datos.detalles.disponible} y se necesitan ${datos.detalles.solicitado}.`
+  }
+  return datos.error || 'Ocurrió un error.'
 }

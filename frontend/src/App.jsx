@@ -1,99 +1,95 @@
-import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
-import { GESTION, ROLES } from './auth/roles.js';
-import { useSesion } from './store/sesion.js';
-import LoginPage from './pages/login/LoginPage.jsx';
-import RegistroPage from './pages/registro/RegistroPage.jsx';
-import AppShell from './layout/AppShell.jsx';
-import InicioPage from './pages/inicio/InicioPage.jsx';
-import RacionesPage from './pages/raciones/RacionesPage.jsx';
-import DespensaLayout from './pages/despensa/DespensaLayout.jsx';
-import ExistenciasPage from './pages/despensa/ExistenciasPage.jsx';
-import ProductoFormPage from './pages/despensa/ProductoFormPage.jsx';
-import DonacionesPage from './pages/despensa/DonacionesPage.jsx';
-import DonacionFormPage from './pages/despensa/DonacionFormPage.jsx';
-import DonacionDetallePage from './pages/despensa/DonacionDetallePage.jsx';
-import CategoriasPage from './pages/despensa/CategoriasPage.jsx';
-import CategoriaFormPage from './pages/despensa/CategoriaFormPage.jsx';
-import SemanaLayout from './pages/semana/SemanaLayout.jsx';
-import SemanaPage from './pages/semana/SemanaPage.jsx';
-import MenuFormPage from './pages/semana/MenuFormPage.jsx';
-import MenuDetallePage from './pages/semana/MenuDetallePage.jsx';
-import VoluntariosPage from './pages/semana/VoluntariosPage.jsx';
-import VoluntarioFormPage from './pages/semana/VoluntarioFormPage.jsx';
-import InformesPage from './pages/informes/InformesPage.jsx';
-import CuentaPage from './pages/cuenta/CuentaPage.jsx';
-import UsuariosPage from './pages/usuarios/UsuariosPage.jsx';
-import UsuarioFormPage from './pages/usuarios/UsuarioFormPage.jsx';
-import ContrasenaPage from './pages/usuarios/ContrasenaPage.jsx';
+import { useEffect } from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import useAuthStore from './store/useAuthStore'
+import UsersRoute from './router/UsersRoute'
+import GestionRoute from './router/GestionRoute'
+import AdminRoute from './router/AdminRoute'
+import Layout from './components/Layout'
+import Login from './pages/public/Login'
+import Registro from './pages/public/Registro'
+import NotFound from './pages/public/NotFound'
+import Unauthorized from './pages/public/Unauthorized'
+import Home from './pages/users/Home'
+import Raciones from './pages/users/Raciones'
+import Semana from './pages/users/Semana'
+import MenuDetalle from './pages/users/MenuDetalle'
+import Cuenta from './pages/users/Cuenta'
+import Productos from './pages/admin/Productos'
+import ProductoForm from './pages/admin/ProductoForm'
+import Movimiento from './pages/admin/Movimiento'
+import Categorias from './pages/admin/Categorias'
+import CategoriaForm from './pages/admin/CategoriaForm'
+import Donaciones from './pages/admin/Donaciones'
+import DonacionForm from './pages/admin/DonacionForm'
+import DonacionDetalle from './pages/admin/DonacionDetalle'
+import MenuForm from './pages/admin/MenuForm'
+import Voluntarios from './pages/admin/Voluntarios'
+import VoluntarioForm from './pages/admin/VoluntarioForm'
+import Informes from './pages/admin/Informes'
+import Usuarios from './pages/admin/Usuarios'
+import UsuarioForm from './pages/admin/UsuarioForm'
+import Contrasena from './pages/admin/Contrasena'
 
-function Protegida({ children }) {
-  const { usuario } = useSesion();
-  return usuario ? children : <Navigate to="/login" replace />;
-}
+const App = () => {
+  const { tema } = useAuthStore()
 
-function SoloRoles({ roles, children }) {
-  const { usuario } = useSesion();
-  return roles.includes(usuario.rol) ? (children ?? <Outlet />) : <Navigate to="/" replace />;
-}
+  // Modo oscuro
+  useEffect(() => {
+    document.documentElement.setAttribute('data-bs-theme', tema)
+  }, [tema])
 
-function Rutas() {
-  return (
-    <Routes>
-      {/* Públicas */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/registro" element={<RegistroPage />} />
-
-      {/* Privadas */}
-      <Route element={<Protegida><AppShell /></Protegida>}>
-        <Route index element={<InicioPage />} />
-        <Route path="raciones" element={<RacionesPage />} />
-
-        <Route path="despensa" element={<SoloRoles roles={GESTION}><DespensaLayout /></SoloRoles>}>
-          <Route index element={<Navigate to="existencias" replace />} />
-          <Route path="existencias" element={<ExistenciasPage />} />
-          <Route path="existencias/nuevo" element={<ProductoFormPage />} />
-          <Route path="existencias/:id/editar" element={<ProductoFormPage />} />
-          <Route path="donaciones" element={<DonacionesPage />} />
-          <Route path="donaciones/nueva" element={<DonacionFormPage />} />
-          <Route path="donaciones/:id" element={<DonacionDetallePage />} />
-          <Route path="donaciones/:id/editar" element={<DonacionFormPage />} />
-          <Route element={<SoloRoles roles={[ROLES.ADMIN]} />}>
-            <Route path="categorias" element={<CategoriasPage />} />
-            <Route path="categorias/nueva" element={<CategoriaFormPage />} />
-            <Route path="categorias/:id/editar" element={<CategoriaFormPage />} />
-          </Route>
-        </Route>
-
-        <Route path="semana" element={<SemanaLayout />}>
-          <Route index element={<SemanaPage />} />
-          <Route path="menus/:id" element={<MenuDetallePage />} />
-          <Route element={<SoloRoles roles={GESTION} />}>
-            <Route path="menus/nuevo" element={<MenuFormPage />} />
-            <Route path="menus/:id/editar" element={<MenuFormPage />} />
-            <Route path="equipo" element={<VoluntariosPage />} />
-            <Route path="equipo/nuevo" element={<VoluntarioFormPage />} />
-            <Route path="equipo/:id/editar" element={<VoluntarioFormPage />} />
-          </Route>
-        </Route>
-
-        <Route path="informes" element={<SoloRoles roles={GESTION}><InformesPage /></SoloRoles>} />
-        <Route path="cuenta" element={<CuentaPage />} />
-        <Route path="usuarios" element={<SoloRoles roles={[ROLES.ADMIN]} />}>
-          <Route index element={<UsuariosPage />} />
-          <Route path="nuevo" element={<UsuarioFormPage />} />
-          <Route path=":id/editar" element={<UsuarioFormPage />} />
-          <Route path=":id/contrasena" element={<ContrasenaPage />} />
-        </Route>
-      </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  );
-}
-
-export default function App() {
   return (
     <BrowserRouter>
-      <Rutas />
+      <Routes>
+        {/* Públicas */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/registro" element={<Registro />} />
+
+        {/* Privadas */}
+        <Route element={<UsersRoute />}>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/raciones" element={<Raciones />} />
+            <Route path="/semana" element={<Semana />} />
+            <Route path="/semana/menus/:id" element={<MenuDetalle />} />
+            <Route path="/cuenta" element={<Cuenta />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
+
+            {/* Admin y Responsable */}
+            <Route element={<GestionRoute />}>
+              <Route path="/productos" element={<Productos />} />
+              <Route path="/productos/nuevo" element={<ProductoForm />} />
+              <Route path="/productos/:id/editar" element={<ProductoForm />} />
+              <Route path="/productos/:id/movimiento" element={<Movimiento />} />
+              <Route path="/donaciones" element={<Donaciones />} />
+              <Route path="/donaciones/nueva" element={<DonacionForm />} />
+              <Route path="/donaciones/:id" element={<DonacionDetalle />} />
+              <Route path="/donaciones/:id/editar" element={<DonacionForm />} />
+              <Route path="/semana/menus/nuevo" element={<MenuForm />} />
+              <Route path="/semana/menus/:id/editar" element={<MenuForm />} />
+              <Route path="/voluntarios" element={<Voluntarios />} />
+              <Route path="/voluntarios/nuevo" element={<VoluntarioForm />} />
+              <Route path="/voluntarios/:id/editar" element={<VoluntarioForm />} />
+              <Route path="/informes" element={<Informes />} />
+            </Route>
+
+            {/* Solo Administrador */}
+            <Route element={<AdminRoute />}>
+              <Route path="/categorias" element={<Categorias />} />
+              <Route path="/categorias/nueva" element={<CategoriaForm />} />
+              <Route path="/categorias/:id/editar" element={<CategoriaForm />} />
+              <Route path="/usuarios" element={<Usuarios />} />
+              <Route path="/usuarios/nuevo" element={<UsuarioForm />} />
+              <Route path="/usuarios/:id/editar" element={<UsuarioForm />} />
+              <Route path="/usuarios/:id/contrasena" element={<Contrasena />} />
+            </Route>
+
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Route>
+      </Routes>
     </BrowserRouter>
-  );
+  )
 }
+
+export default App

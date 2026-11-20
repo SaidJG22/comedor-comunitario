@@ -1,0 +1,16 @@
+/* Ingreso y registro */
+.ingreso { min-height: 100dvh; display: grid; grid-template-rows: 14rem 1fr; }
+.ingreso-foto { background: var(--acento) url('/imagenes/portada.jpg') center top / cover no-repeat; }
+.ingreso-lado { display: grid; place-items: center; padding: 1.5rem 1rem 2rem; }
+.ingreso-tarjeta { width: 100%; max-width: 26rem; border-radius: var(--radio-l); }
+.ingreso-logo { display: block; width: 10rem; height: auto; margin: 0 auto 1rem; }
+
+@media (min-width: 900px) {
+  .ingreso { grid-template-columns: 1fr 1fr; grid-template-rows: none; }
+  .ingreso-foto { min-height: 100dvh; position: sticky; top: 0; }
+}
+
+/* Botón de tema */
+.ingreso-tarjeta { position: relative; }
+.ingreso-tarjeta .boton-tema { position: absolute; top: .75rem; right: .75rem; }
+.ingreso-logo { background: #fff; border-radius: var(--radio); padding: .5rem; }

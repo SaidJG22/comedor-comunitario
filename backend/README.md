@@ -47,25 +47,41 @@ confirmados; los de esta semana y la próxima, planificados), raciones de cada d
 
 ### 6. Ejecutar
 ```
-npm run dev                 # API en http://localhost:3000  (con recarga automática)
+npm run dev                 # API en http://localhost:3000  (con nodemon)
 ```
-`GET /api/health` (API) y `GET /api/health/db` (API + base de datos).
+`GET /api/health` responde si la API está en marcha. Al arrancar, `initServer()` prueba la conexión con la base antes de escuchar.
 
 ## Organización del código
-Cada recurso vive en `src/modules/<recurso>/` y está separado en tres capas:
+Está armado como en las clases (CommonJS, con `require` y `module.exports`):
+
+```
+backend/
+├── index.js        crea la app de Express, monta las rutas y arranca con initServer()
+├── config/db.js    pool de mysql2/promise (lee el .env) y transaccion()
+├── routes/         una por recurso: método HTTP + ruta + middlewares + controlador
+├── controllers/    reciben el pedido y responden (try/catch → next(error))
+├── models/         el SQL, siempre con parámetros ?, y las transacciones
+├── middlewares/    auth.js (verifyToken, checkRole), validate.js (zod), errors.js
+├── schemas/        esquemas de zod de cada recurso
+├── utils/          fechas
+├── scripts/        db-check, seed-admin, seed-usuarios
+└── db/             scripts SQL
+```
 
 | Archivo | Qué hace |
 |---|---|
-| `<recurso>.routes.js` | Define las rutas, valida el pedido con zod (`middleware/validate.js`) y aplica los permisos por rol (`requireRole`). |
-| `<recurso>.controller.js` | Recibe el pedido ya validado, llama al modelo y arma la respuesta (o un `HttpError` con el código que corresponda). |
-| `<recurso>.model.js` | El SQL, siempre con parámetros `?`, y las transacciones. Las reglas que se controlan dentro de una transacción (por ejemplo, "no se puede borrar un menú confirmado") también están acá. |
+| `routes/<recurso>.routes.js` | Define cada ruta con su método, valida con zod (`validate(schema)`) y aplica los permisos (`checkRole(...)`). |
+| `controllers/<recurso>.controllers.js` | Funciones `getX`, `postX`, `putX`, `patchX` y `deleteX`: leen `req.params` y `req.body`, llaman al modelo y responden con el código que corresponde. |
+| `models/<recurso>.model.js` | Las consultas (`const [rows] = await conection.query(sql, [valores])`) y las reglas que van dentro de una transacción (por ejemplo, "no se puede borrar un menú confirmado"). |
 
-`app.js` monta los módulos y `db/pool.js` es el único que habla con MySQL. El modelo de stock (`ingresarStock`, `egresarStock` y `obtenerAlertas`) también lo usan donaciones, menús y reportes.
+`index.js` protege las rutas privadas con `verifyToken` y al final usa `notFound` y `errorHandler`. El modelo de stock (`ingresarStock`, `egresarStock` y `obtenerAlertas`) también lo usan donaciones, menús y reportes.
+
+Errores de validación (400): `{ "error": "Datos inválidos", "errors": [{ "field": "...", "message": "..." }] }`.
 
 ## Endpoints (todos bajo `/api`, con `Authorization: Bearer <token>` salvo login y health)
 | Módulo | Endpoints | Roles |
 |---|---|---|
-| Sesión | `POST /auth/login` (límite de intentos; 403 si la cuenta todavía no está activa) · `POST /auth/registro` (crea un Voluntario **inactivo** hasta que el Administrador lo active; límite de intentos) · `PATCH /auth/password` (cambiar la propia contraseña) | login y registro: públicos; contraseña: cualquier usuario con sesión |
+| Sesión | `POST /auth/login` (403 si la cuenta todavía no está activa) · `POST /auth/registro` (crea un Voluntario **inactivo** hasta que el Administrador lo active) · `PATCH /auth/password` (cambiar la propia contraseña) | login y registro: públicos; contraseña: cualquier usuario con sesión |
 | Stock | `GET /stock/productos`, `GET /stock/productos/:id`, `GET /stock/alertas?dias=7`, `POST /stock/productos`, `PUT /stock/productos/:id` (editar), `PATCH /stock/productos/:id` (baja, solo sin stock), `DELETE /stock/productos/:id` (solo si no tiene historial), `POST /stock/movimientos` | lectura: todos; escritura: Responsable, Administrador |
 | Categorías | `GET /stock/categorias` (con la cantidad de productos de cada una), `GET /stock/categorias/:id`, `POST /stock/categorias`, `PUT /stock/categorias/:id` (409 si el nombre ya existe), `DELETE /stock/categorias/:id` (sus productos quedan "Sin categoría"; no se borra ninguno) | lectura: todos; escritura: solo Administrador |
 | Donaciones | `GET /donaciones/origenes`, `GET /donaciones`, `GET /donaciones/:id`, `POST /donaciones`, `PUT /donaciones/:id` y `DELETE /donaciones/:id` (cambiar productos o borrar solo si no se usó nada) | lectura: todos; escritura: Responsable, Administrador |
@@ -80,4 +96,4 @@ Stock nunca negativo (409); egresos por vencimiento más próximo (FEFO); donaci
 
 **Borrar o dar de baja:** producto, voluntario y usuario se borran de verdad solo si no tienen historial. Si ya tienen movimientos, turnos o datos cargados, la API responde 409 y se los da de baja, para no perder lo registrado.
 
-**Sesión:** en cada pedido, `requireAuth` verifica el JWT y además consulta la base. Si la cuenta fue desactivada, responde 401 en el acto, y siempre usa el rol actual: un cambio de rol no espera a que venza el token.
+**Sesión:** en cada pedido, `verifyToken` verifica el JWT y además consulta la base. Si la cuenta fue desactivada, responde 401 en el acto, y siempre usa el rol actual: un cambio de rol no espera a que venza el token.

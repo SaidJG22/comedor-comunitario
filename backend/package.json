@@ -2,12 +2,11 @@
   "name": "cometuc-backend",
   "version": "0.1.0",
   "description": "API REST de ComeTUC, sistema de gestión del comedor comunitario",
-  "type": "module",
   "private": true,
-  "main": "src/server.js",
+  "main": "index.js",
   "scripts": {
-    "dev": "node --watch src/server.js",
-    "start": "node src/server.js",
+    "dev": "nodemon index.js",
+    "start": "node index.js",
     "db:check": "node scripts/db-check.js",
     "seed:admin": "node scripts/seed-admin.js",
     "seed:usuarios": "node scripts/seed-usuarios.js"
@@ -21,10 +20,11 @@
     "cors": "^2.8.6",
     "dotenv": "^18.0.10",
     "express": "^5.3.0",
-    "express-rate-limit": "^8.7.4",
-    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.24.6",
     "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
   }
 }

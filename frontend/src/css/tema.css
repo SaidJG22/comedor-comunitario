@@ -1,0 +1,58 @@
+/* Botones con nuestros colores */
+.btn-primary {
+  --bs-btn-bg: var(--acento);
+  --bs-btn-border-color: var(--acento);
+  --bs-btn-hover-bg: var(--acento-osc);
+  --bs-btn-hover-border-color: var(--acento-osc);
+  --bs-btn-active-bg: var(--acento-osc);
+  --bs-btn-active-border-color: var(--acento-osc);
+  --bs-btn-disabled-bg: var(--acento);
+  --bs-btn-disabled-border-color: var(--acento);
+}
+.btn-outline-primary {
+  --bs-btn-color: var(--acento);
+  --bs-btn-border-color: var(--acento);
+  --bs-btn-hover-bg: var(--acento);
+  --bs-btn-hover-border-color: var(--acento);
+  --bs-btn-active-bg: var(--acento-osc);
+  --bs-btn-active-border-color: var(--acento-osc);
+}
+.btn-outline-secondary {
+  --bs-btn-color: var(--texto);
+  --bs-btn-border-color: var(--borde-fuerte);
+  --bs-btn-hover-color: var(--texto);
+  --bs-btn-hover-bg: var(--acento-suave);
+  --bs-btn-hover-border-color: var(--acento);
+  --bs-btn-active-color: var(--texto);
+  --bs-btn-active-bg: var(--acento-suave);
+  --bs-btn-active-border-color: var(--acento);
+}
+.btn-danger {
+  --bs-btn-bg: var(--peligro);
+  --bs-btn-border-color: var(--peligro);
+  --bs-btn-hover-bg: var(--peligro-osc);
+  --bs-btn-hover-border-color: var(--peligro-osc);
+  --bs-btn-active-bg: var(--peligro-osc);
+  --bs-btn-active-border-color: var(--peligro-osc);
+}
+.btn-outline-danger {
+  --bs-btn-color: var(--peligro);
+  --bs-btn-border-color: var(--peligro);
+  --bs-btn-hover-bg: var(--peligro);
+  --bs-btn-hover-border-color: var(--peligro);
+  --bs-btn-active-bg: var(--peligro-osc);
+  --bs-btn-active-border-color: var(--peligro-osc);
+}
+.btn-link { --bs-btn-color: var(--acento-osc); --bs-btn-hover-color: var(--acento); }
+
+/* Pestañas e interruptores */
+.nav-tabs .nav-link { color: var(--texto-suave); }
+.nav-tabs .nav-link.active { color: var(--acento); font-weight: 600; }
+.form-check-input:checked { background-color: var(--acento); border-color: var(--acento); }
+.dropdown-item.active, .dropdown-item:active { background-color: var(--acento); }
+
+/* Celular */
+@media (max-width: 575.98px) {
+  .btn { min-height: 44px; }
+  .btn-sm { min-height: 40px; }
+}

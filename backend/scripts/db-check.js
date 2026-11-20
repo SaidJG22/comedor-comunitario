@@ -1,7 +1,13 @@
 // Diagnóstico de la base
-import { existsSync } from 'node:fs';
-import { loadEnv } from '../src/config/env.js';
-import { createDb } from '../src/db/pool.js';
+const { existsSync } = require('node:fs');
+const path = require('node:path');
+
+if (!existsSync(path.join(__dirname, '..', '.env'))) {
+  console.error('✗ No existe backend/.env. Copiá .env.example a .env y completá DB_USER, DB_PASSWORD y JWT_SECRET.');
+  process.exit(1);
+}
+
+const { conection } = require('../config/db.js');
 
 const TABLAS_ESPERADAS = [
   'rol', 'usuario', 'categoria', 'producto', 'lote_stock', 'movimiento_stock', 'origen_donacion',
@@ -14,51 +20,51 @@ const AYUDA = {
   ER_BAD_DB_ERROR: 'La base de datos no existe. Ejecutá backend/db/schema.sql en MySQL Workbench.',
 };
 
-if (!existsSync(new URL('../.env', import.meta.url))) {
-  console.error('✗ No existe backend/.env. Copiá .env.example a .env y completá DB_USER, DB_PASSWORD y JWT_SECRET.');
-  process.exit(1);
-}
-
-const env = loadEnv();
-const db = createDb(env.db);
 let fallo = false;
-const ok = (m) => console.log(`✓ ${m}`);
-const mal = (m) => {
+const ok = (mensaje) => console.log(`✓ ${mensaje}`);
+const mal = (mensaje) => {
   fallo = true;
-  console.error(`✗ ${m}`);
+  console.error(`✗ ${mensaje}`);
 };
 
-try {
-  console.log(`Conectando a ${env.db.host}:${env.db.port} como "${env.db.user}" (base "${env.db.database}")…`);
-  const [info] = await db.query('SELECT VERSION() AS version, @@sql_mode AS modo');
-  ok(`Servidor MySQL ${info.version}`);
-  if (!info.version.startsWith('8.')) mal('Se esperaba MySQL 8.x.');
-  ok(`sql_mode: ${info.modo.includes('ONLY_FULL_GROUP_BY') ? 'incluye ONLY_FULL_GROUP_BY (las consultas son compatibles)' : info.modo || '(vacío)'}`);
+const revisar = async () => {
+  const { DB_HOST = 'localhost', DB_PORT = 3306, DB_USER, DB_NAME = 'cometuc' } = process.env;
+  try {
+    console.log(`Conectando a ${DB_HOST}:${DB_PORT} como "${DB_USER}" (base "${DB_NAME}")…`);
+    const [info] = await conection.query('SELECT VERSION() AS version, @@sql_mode AS modo');
+    ok(`Servidor MySQL ${info[0].version}`);
+    if (!info[0].version.startsWith('8.')) mal('Se esperaba MySQL 8.x.');
+    const modo = info[0].modo;
+    ok(`sql_mode: ${modo.includes('ONLY_FULL_GROUP_BY') ? 'incluye ONLY_FULL_GROUP_BY (las consultas son compatibles)' : modo || '(vacío)'}`);
 
-  const tablas = (await db.query('SELECT table_name AS t FROM information_schema.tables WHERE table_schema = DATABASE()')).map((r) => r.t.toLowerCase());
-  const faltan = TABLAS_ESPERADAS.filter((t) => !tablas.includes(t));
-  if (faltan.length) mal(`Faltan tablas: ${faltan.join(', ')}. Ejecutá backend/db/schema.sql.`);
-  else ok(`Las ${TABLAS_ESPERADAS.length} tablas existen`);
+    const [tablasRows] = await conection.query('SELECT table_name AS t FROM information_schema.tables WHERE table_schema = DATABASE()');
+    const tablas = tablasRows.map((r) => r.t.toLowerCase());
+    const faltan = TABLAS_ESPERADAS.filter((t) => !tablas.includes(t));
+    if (faltan.length) mal(`Faltan tablas: ${faltan.join(', ')}. Ejecutá backend/db/schema.sql.`);
+    else ok(`Las ${TABLAS_ESPERADAS.length} tablas existen`);
 
-  if (!faltan.includes('rol')) {
-    const roles = (await db.query('SELECT nombre FROM rol ORDER BY id')).map((r) => r.nombre);
-    if (roles.length === 3) ok(`Roles cargados: ${roles.join(', ')}`);
-    else mal('Faltan los roles. Ejecutá backend/db/seed.sql.');
-    const [{ n }] = await db.query(
-      "SELECT COUNT(*) AS n FROM usuario u JOIN rol r ON r.id = u.rol_id WHERE r.nombre = 'Administrador' AND u.activo = TRUE",
+    if (!faltan.includes('rol')) {
+      const [rolesRows] = await conection.query('SELECT nombre FROM rol ORDER BY id');
+      const roles = rolesRows.map((r) => r.nombre);
+      if (roles.length === 3) ok(`Roles cargados: ${roles.join(', ')}`);
+      else mal('Faltan los roles. Ejecutá backend/db/seed.sql.');
+      const [admins] = await conection.query(
+        "SELECT COUNT(*) AS n FROM usuario u JOIN rol r ON r.id = u.rol_id WHERE r.nombre = 'Administrador' AND u.activo = TRUE",
+      );
+      if (admins[0].n > 0) ok(`Administradores activos: ${admins[0].n}`);
+      else console.log('• Todavía no hay administrador: creálo con "npm run seed:admin".');
+    }
+    const [personas] = await conection.query(
+      "SELECT COUNT(*) AS n FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name REGEXP 'benefici|persona|asistente'",
     );
-    if (n > 0) ok(`Administradores activos: ${n}`);
-    else console.log('• Todavía no hay administrador: creálo con "npm run seed:admin".');
+    if (personas[0].n === 0) ok('No hay tablas de personas asistidas');
+    else mal('Hay tablas que parecen guardar personas asistidas: revisar el modelo.');
+  } catch (error) {
+    mal(AYUDA[error.code] ?? `${error.code ?? 'Error'}: ${error.message}`);
+  } finally {
+    await conection.end().catch(() => {});
   }
-  const [{ n: personas }] = await db.query(
-    "SELECT COUNT(*) AS n FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name REGEXP 'benefici|persona|asistente'",
-  );
-  if (personas === 0) ok('No hay tablas de personas asistidas');
-  else mal('Hay tablas que parecen guardar personas asistidas: revisar el modelo.');
-} catch (err) {
-  mal(AYUDA[err.code] ?? `${err.code ?? 'Error'}: ${err.message}`);
-} finally {
-  await db.close().catch(() => {});
-}
+  process.exit(fallo ? 1 : 0);
+};
 
-process.exit(fallo ? 1 : 0);
+revisar();
